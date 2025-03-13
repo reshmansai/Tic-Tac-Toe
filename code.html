@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: rgb(8, 48, 67);
+            color: whitesmoke;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 3px;
+            margin: 20px auto;
+            width: max-content;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            background: #a4d4dd;
+            border: 2px solid #333;
+            cursor: pointer;
+            color: rgb(8, 48, 67);
+        }
+        .cell.disabled {
+            pointer-events: none;
+        }
+        .cell:hover{
+            background-color: rgb(125, 147, 157);
+        }
+        #status {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        #reset {
+            padding: 10px 20px;
+            font-size: 1em;
+            background: rgb(8, 48, 67);
+            color: white;
+            border: 2px solid rgb(10, 40, 71);
+            cursor: pointer;
+        }
+        #reset:hover{
+            background-color:rgb(125, 147, 157) ;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tic-Tac-Toe</h1>
+    <div id="status">Player X's turn</div>
+    <div class="board" id="board"></div>
+    <button id="reset">Restart Game</button>
+
+    <script>
+        const board = document.getElementById("board");
+        const statusText = document.getElementById("status");
+        const resetButton = document.getElementById("reset");
+        let currentPlayer = "X";
+        let boardState = ["", "", "", "", "", "", "", "", ""];
+
+        function createBoard() {
+            board.innerHTML = "";
+            boardState.forEach((cell, index) => {
+                const cellElement = document.createElement("div");
+                cellElement.classList.add("cell");
+                cellElement.dataset.index = index;
+                cellElement.textContent = cell;
+                cellElement.addEventListener("click", handleMove);
+                board.appendChild(cellElement);
+            });
+        }
+
+        function handleMove(event) {
+            const index = event.target.dataset.index;
+            if (boardState[index] === "") {
+                boardState[index] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                event.target.classList.add("disabled");
+                if (checkWin()) {
+                    statusText.textContent = `Player ${currentPlayer} wins!`;
+                    disableBoard();
+                } else if (boardState.every(cell => cell !== "")) {
+                    statusText.textContent = "It's a draw!";
+                } else {
+                    currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    statusText.textContent = `Player ${currentPlayer}'s turn`;
+                }
+            }
+        }
+
+        function checkWin() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6] 
+            ];
+            return winPatterns.some(pattern =>
+                boardState[pattern[0]] &&
+                boardState[pattern[0]] === boardState[pattern[1]] &&
+                boardState[pattern[0]] === boardState[pattern[2]]
+            );
+        }
+
+        function disableBoard() {
+            document.querySelectorAll(".cell").forEach(cell => {
+                cell.classList.add("disabled");
+            });
+        }
+
+        resetButton.addEventListener("click", () => {
+            boardState = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            statusText.textContent = `Player X's turn`;
+            createBoard();
+        });
+
+        createBoard();
+    </script>
+
+</body>
+</html>
